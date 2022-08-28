@@ -6,20 +6,25 @@
 using namespace std;
 
 struct Ad {
-    int id;
-    char name[30];
-    int duration;
-    int sequence;
+    int id{};
+    char name[30]{};
+    int duration{};
+    int sequence{};
+
+    struct Ad *next{};
 };
 
 struct Channels {
     int id{};
     char name[30]{};
 
-    Ad ads{};
-    struct Channels *prev{};
-    struct Channels *next{};
+    struct Ad ads[20];
+
+    struct Channels *next;
+    struct Channels **head;
 };
+
+Channels *head;
 
 Channels *create_channels(const char *filename);
 
@@ -30,9 +35,9 @@ char *find_splitter(char **line, int size);
 void split(const char *str, char del);
 //int l
 
-#define CHANNEL_LIST "/home/ubuntu/CLionProjects/task5cpp/channels.txt" // адрес основного текста
-#define ADS_LIST "/home/ubuntu/CLionProjects/task5cpp/ads.txt" // адрес дополнительного текста
-#define TOTAL_LIST "/home/ubuntu/CLionProjects/task5cpp/total_list.txt" // адрес итогового текста
+#define CHANNEL_LIST "/home/apheyhys/CLionProjects/task5cpp/channels.txt" // адрес основного текста
+#define ADS_LIST "/home/apheyhys/CLionProjects/task5cpp/ads.txt" // адрес дополнительного текста
+#define TOTAL_LIST "/home/apheyhys/CLionProjects/task5cpp/total_list.txt" // адрес итогового текста
 
 
 int main() {
@@ -74,14 +79,17 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
     // Читаем все символы, включая пробелы
     readfile >> std::noskipws;
 
+//    struct Channels* head = nullptr;
 
-    Channels *a_begin = nullptr;
-    Channels *a = nullptr;
+
+//    Channels *p_begin = nullptr;
+//    Channels *a = nullptr;
     // Выделяем память
-    a_begin = (Channels *) malloc(sizeof(Channels)); // Выделяем память под первую ячейку структуры
-    a = p_begin;
-    a->next = nullptr;
+//    a_begin = (Channels *) malloc(sizeof(Channels)); // Выделяем память под первую ячейку структуры
+//    p = p_begin;
 //    p->name = 0;
+//p_begin = head;
+    Channels *p = p_begin;
 
     char id[30]{};
 
@@ -91,8 +99,6 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
     } else {
         while (true) {
             readfile.getline(id, 30);
-
-//            cout << id << endl;
 
             if (!readfile.eof()) {
                 unsigned int limit1[5]{};
@@ -111,6 +117,7 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
                     }
                     if (id[i] == ';') {
                         limit2 = i;
+                        break;
                     }
                     i++;
                 }
@@ -162,14 +169,105 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
 
                 cout << id << endl;
 
-                cout << "ID: " << ads_id[0] << ads_id[1] << endl;
-                cout << "Name: " << name << endl;
-                cout << "Duration: " << duration[0] << duration[1] << endl;
-                cout << "Channels: " << channels_id_arr[0] << channels_id_arr[1] << channels_id_arr[2]
-                     << channels_id_arr[3] << endl;
-                cout << "Sequence: " << sequence[0] << sequence[1] << endl;
+                int convert_id = (int(ads_id[0])-48)*10 + int(ads_id[1]-48);
+
+                int convert_duration = (int(duration[0])-48)*10 + int(duration[1]-48);
+
+                int convert_sequence = (int(sequence[0])-48)*10 + int(sequence[1]-48);
+
+//                cout << "ID: " << convert_id << endl;
+//                cout << "Name: " << name << endl;
+//                cout << "Duration: " << convert_duration << endl;
+//                cout << "Channels: " << channels_id_arr[0] << channels_id_arr[1] << channels_id_arr[2]
+//                     << channels_id_arr[3] << endl;
+//                cout << "Sequence: " << convert_sequence << endl;
 
                 cout << "+++++++++++++" << endl;
+
+//                p = p_begin;
+
+                while (p != nullptr) {
+                    cout << p->name << endl;
+                    p = p->next;
+                }
+
+
+
+                p = p_begin;
+
+
+//                for (int k = 0; k < 5; k++) {
+//                    cout << p[k].name << endl;
+//                }
+//                p_begin->next = p_begin;
+
+
+//                head = p_begin;
+//                p_begin->next = head;
+
+
+//                cout << p_begin->id << endl;
+
+
+//                p_begin->next = p_begin[0].next;
+
+
+//                p_begin->next = (*head);
+//
+//                (*head) = p_begin;
+//
+//                p_begin->next = p_begin.;
+
+//                head = p_begin;
+//                p_begin = p_begin.;
+
+
+
+                for (int n = 0; n < 4; n++) {
+                    cout << n << endl;
+
+
+//                    p_begin->next = nullptr;
+//                    p_begin = p_begin->next;
+                    if (channels_id_arr[n]){
+
+//                        cout << channels_id_arr[n] << endl;
+//                        cout << int(channels_id_arr[n]-48) << endl;
+//                        while (p_begin != nullptr) {
+
+//                        }
+//                        if ( p_begin->id == convert_id) {
+//                            p_begin[n].ads->id = convert_id;
+//                            p_begin->next;
+//                        }
+
+//
+//                        cout << *p_begin[n].ads.id << endl;
+//                        cout << p_begin[n].ads.id << endl;
+//                        p_begin = (Ad *) malloc(sizeof(Ad));
+//                        p_begin[n].ads->id = convert_id;
+//                        p_begin[n].ads->duration = convert_duration;
+//                        p_begin[n].ads->sequence = convert_sequence;
+//                        p_begin[n].ads->next;
+
+
+//                        p_begin = p_begin->next;
+//                        for (int k = 0; k < 4; k++) {
+//                            cout << p_begin->id << endl;
+//                            p_begin = p_begin->next;
+//                        }
+                    }
+                }
+
+//                p_begin->next = nullptr;
+//                    p_begin = p_begin->next;
+
+
+
+
+
+
+
 
 
 
