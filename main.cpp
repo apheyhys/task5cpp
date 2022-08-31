@@ -1,27 +1,26 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>
+//#include <cstring>
 #include <vector>
 
 using namespace std;
 
 struct Ad {
-    int id{};
-    char name[30]{};
-    int duration{};
-    int sequence{};
+    int id;
+    char name[30];
+    int duration;
+    int sequence;
 
-    struct Ad *next{};
+    Ad *next;
 };
 
 struct Channels {
-    int id{};
-    char name[30]{};
+    int id;
+    char name[30];
 
-    struct Ad ads[20];
+    struct Ad *ads;
 
-    struct Channels *next;
-    struct Channels **head;
+    Channels *next;
 };
 
 Channels *head;
@@ -35,8 +34,8 @@ char *find_splitter(char **line, int size);
 void split(const char *str, char del);
 //int l
 
-#define CHANNEL_LIST "/home/apheyhys/CLionProjects/task5cpp/channels.txt" // адрес основного текста
-#define ADS_LIST "/home/apheyhys/CLionProjects/task5cpp/ads.txt" // адрес дополнительного текста
+#define CHANNEL_LIST "/home/ubuntu/CLionProjects/task5cpp/channels.txt" // адрес основного текста
+#define ADS_LIST "/home/ubuntu/CLionProjects/task5cpp/ads.txt" // адрес дополнительного текста
 #define TOTAL_LIST "/home/apheyhys/CLionProjects/task5cpp/total_list.txt" // адрес итогового текста
 
 
@@ -144,6 +143,8 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
 
                 for (int k = 0; k < limit2; k++) {
                     if (k < limit1[0]) {
+//                        ads_id[ads_id_count] = id.;
+//                        id << ads_id[ads_id_count];
                         ads_id[ads_id_count] = id[k];
                         ads_id_count++;
                     }
@@ -167,13 +168,17 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
                     }
                 }
 
-                cout << id << endl;
+                int convert_id;
 
-                int convert_id = (int(ads_id[0])-48)*10 + int(ads_id[1]-48);
+                if (ads_id[1]) {
+                    convert_id = (int(ads_id[0]) - 48) * 10 + int(ads_id[1]) - 48;
+                } else {
+                    convert_id = int(ads_id[0]) - 48;
+                }
 
-                int convert_duration = (int(duration[0])-48)*10 + int(duration[1]-48);
+                int convert_duration = (int(duration[0]) - 48) * 10 + int(duration[1] - 48);
 
-                int convert_sequence = (int(sequence[0])-48)*10 + int(sequence[1]-48);
+                int convert_sequence = (int(sequence[0]) - 48) * 10 + int(sequence[1] - 48);
 
 //                cout << "ID: " << convert_id << endl;
 //                cout << "Name: " << name << endl;
@@ -181,134 +186,31 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
 //                cout << "Channels: " << channels_id_arr[0] << channels_id_arr[1] << channels_id_arr[2]
 //                     << channels_id_arr[3] << endl;
 //                cout << "Sequence: " << convert_sequence << endl;
-
+                cout << id << endl;
                 cout << "+++++++++++++" << endl;
-
-//                p = p_begin;
-
-                while (p != nullptr) {
-                    cout << p->name << endl;
-                    p = p->next;
-                }
-
-
-
-                p = p_begin;
-
-
-//                for (int k = 0; k < 5; k++) {
-//                    cout << p[k].name << endl;
-//                }
-//                p_begin->next = p_begin;
-
-
-//                head = p_begin;
-//                p_begin->next = head;
-
-
-//                cout << p_begin->id << endl;
-
-
-//                p_begin->next = p_begin[0].next;
-
-
-//                p_begin->next = (*head);
 //
-//                (*head) = p_begin;
-//
-//                p_begin->next = p_begin.;
 
-//                head = p_begin;
-//                p_begin = p_begin.;
+                for (char t: channels_id_arr) {
+                    while (p != nullptr) {
+                        if (int(t) - 48 == p->id) {
+                            cout << "Совпало" << endl;
+                            struct Ad *temp, *a;
+                            temp = (Ad *) malloc(sizeof(Ad)); // выделяем память
+                            a = p->ads; // сохранение указателя на следующий узел
+                            p->ads = temp; // предыдущий узел указывает на создаваемый
+                            temp->id = convert_id; // сохранение поля данных добавляемого узла
+                            temp->duration = convert_duration;
+                            while(char s: name) {
+                                temp->name += name[s];
+                            }
 
-
-
-                for (int n = 0; n < 4; n++) {
-                    cout << n << endl;
-
-
-//                    p_begin->next = nullptr;
-//                    p_begin = p_begin->next;
-                    if (channels_id_arr[n]){
-
-//                        cout << channels_id_arr[n] << endl;
-//                        cout << int(channels_id_arr[n]-48) << endl;
-//                        while (p_begin != nullptr) {
-
-//                        }
-//                        if ( p_begin->id == convert_id) {
-//                            p_begin[n].ads->id = convert_id;
-//                            p_begin->next;
-//                        }
-
-//
-//                        cout << *p_begin[n].ads.id << endl;
-//                        cout << p_begin[n].ads.id << endl;
-//                        p_begin = (Ad *) malloc(sizeof(Ad));
-//                        p_begin[n].ads->id = convert_id;
-//                        p_begin[n].ads->duration = convert_duration;
-//                        p_begin[n].ads->sequence = convert_sequence;
-//                        p_begin[n].ads->next;
-
-
-//                        p_begin = p_begin->next;
-//                        for (int k = 0; k < 4; k++) {
-//                            cout << p_begin->id << endl;
-//                            p_begin = p_begin->next;
-//                        }
+                            temp->sequence = convert_sequence;
+                            temp->next = a;  // созданный узел указывает на следующий элемент
+                        }
+                        p = p->next;
                     }
+                    p = p_begin;
                 }
-
-//                p_begin->next = nullptr;
-//                    p_begin = p_begin->next;
-
-
-
-
-
-
-
-
-
-
-
-
-//                int concat = 0;
-//                concat = int(ads_id);
-
-
-//                cout << limit1[0] << "|" << limit1[1] << "|" <<limit1[2] << "|" <<limit1[3]<< "|"  << limit1[4]<< "|"  << endl;
-
-
-//
-//                char channel_id;
-//
-//                char name[30]{};
-//
-//                int name_count = 0;
-//
-//                for (int k = 0; k < limit2; k++) {
-//                    if (k < limit1) {
-//                        channel_id = id[k];
-//                    }
-//                    if (k > limit1 && k < limit2) {
-//                        name[name_count] = id[k];
-//                        name_count++;
-//                    }
-//                }
-//
-//                p->id = int(channel_id) - 48;
-//                for (int n = 0; n < 30; n++) {
-//                    p->name[n] = name[n];
-//                }
-//
-//                p->next = (Channels *) malloc(sizeof(Channels));
-//                p = p->next;
-
-//                cout << int(channel_id) - 48 << endl;
-//                cout << name << endl;
-
-//                p->next = nullptr;
             } else break;
         }
 
