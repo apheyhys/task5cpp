@@ -49,8 +49,8 @@ Channels *create_channels(const char *filename);
 void *create_total_structure(Channels *p_begin, const char *filename);
 
 
-#define CHANNEL_LIST "/home/ubuntu/CLionProjects/task5cpp/channels.txt" // адрес основного текста
-#define ADS_LIST "/home/ubuntu/CLionProjects/task5cpp/ads.txt" // адрес дополнительного текста
+#define CHANNEL_LIST "/home/apheyhys/CLionProjects/task5cpp/channels.txt" // адрес основного текста
+#define ADS_LIST "/home/apheyhys/CLionProjects/task5cpp/ads.txt" // адрес дополнительного текста
 #define TOTAL_LIST "/home/apheyhys/CLionProjects/task5cpp/total_list.txt" // адрес итогового текста
 
 Broadcast *broadcast_structure(Channels *p_begin);
@@ -74,22 +74,19 @@ int main() {
 void print_structure(Broadcast *p_begin) {
     // Печатаем до последнего символа
     while (p_begin != nullptr) {
-        if (p_begin->next != nullptr) {
+//        if (p_begin != nullptr) {
             cout << "--------------------------------" << endl;
             cout << "Название канала: " << p_begin->name << endl;
             cout << "--------------------------------" << endl;
-//            while (p_begin->broadcast_ads->next != nullptr) {
-//                cout << "Время начала ролика: " << setfill('0') << setw(2) << p_begin->broadcast_ads->hour << ":" << setfill('0')
-//                     << setw(2) << p_begin->broadcast_ads->minute << " Название ролика: " << p_begin->broadcast_ads->name <<
-//                     " Длительность: " <<  p_begin->broadcast_ads->duration << " ceк."
-//                     << endl;
-//
-//
-//
-//                p_begin->broadcast_ads = p_begin->broadcast_ads->next;
-//            }
+            while (p_begin->broadcast_ads != nullptr) {
+                cout << "Время начала ролика: " << setfill('0') << setw(2) << p_begin->broadcast_ads->hour << ":" << setfill('0')
+                     << setw(2) << p_begin->broadcast_ads->minute << " Название ролика: " << p_begin->broadcast_ads->name <<
+                     " Длительность: " <<  p_begin->broadcast_ads->duration << " ceк."
+                     << endl;
+                p_begin->broadcast_ads = p_begin->broadcast_ads->next;
+            }
             p_begin = p_begin->next;
-        }
+//        }
 
 
     }
@@ -107,7 +104,7 @@ Broadcast *broadcast_structure(Channels *p_begin) {
     b = b_begin;
     b->next = nullptr;
 
-    // Генератор псевдослучайных чисел определения часа, в котором будет происходить вещание
+    // Генератор псевдослучайных чисел, для определения часа, в котором будет происходить вещание
     random_device rd;
     mt19937 mt(rd());
     uniform_int_distribution<int> dist(0, 23.0);
@@ -164,11 +161,10 @@ Broadcast *broadcast_structure(Channels *p_begin) {
 
 
                 struct Broadcast_ads *temp, *ab;
-                temp = (Broadcast_ads *) malloc(sizeof(Broadcast_ads)); // выделяем память для вложенной структуры
+                temp = (Broadcast_ads *) malloc(
+                        sizeof(Broadcast_ads)); // выделяем память для элемента вложенной структуры
 
                 ab = b->broadcast_ads; // сохранение указателя на следующий узел
-//                ab
-//                temp->next = nullptr;
                 b->broadcast_ads = temp; // предыдущий узел указывает на создаваемый
 
                 temp->duration = p->ads->duration;
@@ -182,19 +178,8 @@ Broadcast *broadcast_structure(Channels *p_begin) {
                 temp->hour = random_hour;
                 temp->minute = position_count;
 
-
-
-//                temp->next = nullptr;
-
-//                while (temp->next) {
-//                    ab = ab->next;
-//                }
-
-//                temp->next = ab;
-//                b->broadcast_ads = temp;
-ab->next = (Broadcast_ads *) malloc(sizeof(Broadcast_ads));
-               temp = ab->next;
-//                ab = ab->next;
+                temp->next = (Broadcast_ads *) malloc(sizeof(Broadcast_ads));
+                temp->next = ab;
 
                 priority = p->ads->sequence;
                 current_id = p->ads->id;
