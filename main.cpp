@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
-//#include <cstring>
-#include <vector>
+#include <ctime>
+#include <cstdlib>
+#include <random>
+#include <iomanip>
 
 using namespace std;
 
@@ -23,71 +25,205 @@ struct Channels {
     Channels *next;
 };
 
-Channels *head;
+// Структуры для сетки вещания
+
+struct Broadcast_ads {
+    char name[30];
+    int duration;
+    int hour;
+    int minute;
+
+    Broadcast_ads *next;
+};
+
+struct Broadcast {
+    char name[30];
+
+    struct Broadcast_ads *broadcast_ads;
+
+    Broadcast *next;
+};
 
 Channels *create_channels(const char *filename);
 
-Channels *create_total_structure(Channels *p_begin, const char *filename);
+void *create_total_structure(Channels *p_begin, const char *filename);
 
-char *find_splitter(char **line, int size);
-
-void split(const char *str, char del);
-//int l
 
 #define CHANNEL_LIST "/home/ubuntu/CLionProjects/task5cpp/channels.txt" // адрес основного текста
 #define ADS_LIST "/home/ubuntu/CLionProjects/task5cpp/ads.txt" // адрес дополнительного текста
 #define TOTAL_LIST "/home/apheyhys/CLionProjects/task5cpp/total_list.txt" // адрес итогового текста
 
+Broadcast *broadcast_structure(Channels *p_begin);
+
+void print_structure(Broadcast *p_begin);
+
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-
+    cout << "--------------------------------" << endl;
+    cout << "\nДемонстрация работы каналов:   \n" << endl;
     Channels *channels_list = create_channels(CHANNEL_LIST);
 
-    Channels *total_structure = create_total_structure(channels_list, ADS_LIST);
+    create_total_structure(channels_list, ADS_LIST);
 
-
-
-//
-//    char largechars[] = "def1:def2:def3#abc1:abc2:abc3#ghi1:ghi2:ghi3";
-//    vector<char*> v;
-//    char* chars_array = strtok(largechars, "#");
-//    while(chars_array)
-//    {
-//        v.push_back(chars_array);
-//        chars_array = strtok(NULL, "#");
-//    }
-//
-//    for(size_t n = 0; n < v.size(); ++n)
-//    {
-//        char* subchar_array = strtok(v[n], ":");
-//        while (subchar_array) {
-//            cout << subchar_array << '\n';
-//            subchar_array = strtok(NULL, ":");
-//        }
-//    }
-
+    Broadcast *broadcast_struct = broadcast_structure(channels_list);
+    print_structure(broadcast_struct);
 
     return 0;
 }
 
-Channels *create_total_structure(Channels *p_begin, const char *filename) {
-//    cout << p_begin[1].name << endl;
+void print_structure(Broadcast *p_begin) {
+    // Печатаем до последнего символа
+    while (p_begin != nullptr) {
+        if (p_begin->next != nullptr) {
+            cout << "--------------------------------" << endl;
+            cout << "Название канала: " << p_begin->name << endl;
+            cout << "--------------------------------" << endl;
+//            while (p_begin->broadcast_ads->next != nullptr) {
+//                cout << "Время начала ролика: " << setfill('0') << setw(2) << p_begin->broadcast_ads->hour << ":" << setfill('0')
+//                     << setw(2) << p_begin->broadcast_ads->minute << " Название ролика: " << p_begin->broadcast_ads->name <<
+//                     " Длительность: " <<  p_begin->broadcast_ads->duration << " ceк."
+//                     << endl;
+//
+//
+//
+//                p_begin->broadcast_ads = p_begin->broadcast_ads->next;
+//            }
+            p_begin = p_begin->next;
+        }
+
+
+    }
+}
+
+
+Broadcast *broadcast_structure(Channels *p_begin) {
+    Channels *p = p_begin;
+
+    // Инициализируем структуру, в которую будет записывать вещание
+    Broadcast *b_begin = nullptr;
+    Broadcast *b = nullptr;
+    // Выделяем память
+    b_begin = (Broadcast *) malloc(sizeof(Broadcast)); // Выделяем память под первую ячейку структуры
+    b = b_begin;
+    b->next = nullptr;
+
+    // Генератор псевдослучайных чисел определения часа, в котором будет происходить вещание
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_int_distribution<int> dist(0, 23.0);
+    int random_hour = dist(mt);
+
+    while (p != nullptr) {
+        // Переписываем названия каналов
+        int name_count = 0;
+        for (char t: p->name) {
+            b->name[name_count] = t;
+            name_count++;
+        }
+
+        int position_count = 0;
+
+        int ads_count = 0;
+
+        int ads_priority = 0;
+
+        Ad *a = p->ads; // Запоминаем голову списка рекламных роликов
+
+        int ads_arr[20];
+
+        // Первый раз обходим список и подсчитываем количество роликов в каждом канале, также находим ролик с максимальным приоритетом
+        while (p->ads != nullptr) {
+
+            if (p->ads->sequence > ads_priority) {
+                ads_priority = p->ads->sequence;
+            }
+            ads_arr[ads_count] = p->ads->id;
+            ads_count++;
+
+            p->ads = p->ads->next;
+        }
+        p->ads = a;
+
+
+        int broadcasting_count = 0;
+
+        int priority = ads_priority;
+
+        int current_id;
+
+        while (broadcasting_count < 60 && p->ads != nullptr) {
+            int rand_ads = ads_arr[random() % ads_count];
+
+            // Если рандомный ролик из массива равен текущему и его приоритет меньше предыдущего и текущий id ролика не равен предыдущему
+            if (rand_ads == p->ads->id && priority > p->ads->sequence && current_id != rand_ads) {
+//                cout << "Время начала ролика: " << setfill('0') << setw(2) << random_hour << ":" << setfill('0')
+//                     << setw(2) << position_count << " Название ролика: " << p->ads->name <<
+//                     " Длительность: " << p->ads->duration << " ceк." << " Приоритет: " << p->ads->sequence
+//                     << endl;
+
+
+
+                struct Broadcast_ads *temp, *ab;
+                temp = (Broadcast_ads *) malloc(sizeof(Broadcast_ads)); // выделяем память для вложенной структуры
+
+                ab = b->broadcast_ads; // сохранение указателя на следующий узел
+//                ab
+//                temp->next = nullptr;
+                b->broadcast_ads = temp; // предыдущий узел указывает на создаваемый
+
+                temp->duration = p->ads->duration;
+
+                int word_count = 0;
+
+                for (char s: p->ads->name) {
+                    temp->name[word_count] = s;
+                    word_count++;
+                }
+                temp->hour = random_hour;
+                temp->minute = position_count;
+
+
+
+//                temp->next = nullptr;
+
+//                while (temp->next) {
+//                    ab = ab->next;
+//                }
+
+//                temp->next = ab;
+//                b->broadcast_ads = temp;
+ab->next = (Broadcast_ads *) malloc(sizeof(Broadcast_ads));
+               temp = ab->next;
+//                ab = ab->next;
+
+                priority = p->ads->sequence;
+                current_id = p->ads->id;
+                broadcasting_count++;
+                position_count++;
+            }
+            p->ads = p->ads->next;
+            if (p->ads == nullptr) {
+                priority = ads_priority;
+                p->ads = a;
+            }
+        }
+        if (p->next != nullptr) {
+            b->next = (Broadcast *) malloc(sizeof(Broadcast));
+            b = b->next;
+        }
+        p = p->next;
+    }
+
+    return b_begin;
+}
+
+
+void *create_total_structure(Channels *p_begin, const char *filename) {
     // Открываем файл
     ifstream readfile(filename, ios::in);
     // Читаем все символы, включая пробелы
     readfile >> std::noskipws;
 
-//    struct Channels* head = nullptr;
-
-
-//    Channels *p_begin = nullptr;
-//    Channels *a = nullptr;
-    // Выделяем память
-//    a_begin = (Channels *) malloc(sizeof(Channels)); // Выделяем память под первую ячейку структуры
-//    p = p_begin;
-//    p->name = 0;
-//p_begin = head;
     Channels *p = p_begin;
 
     char id[30]{};
@@ -110,7 +246,6 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
                 for (auto x: id) {
 
                     if (id[i] == ':') {
-                        cout << id[i] << i << endl;
                         limit1[two_point_count] = i;
                         two_point_count++;
                     }
@@ -143,8 +278,6 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
 
                 for (int k = 0; k < limit2; k++) {
                     if (k < limit1[0]) {
-//                        ads_id[ads_id_count] = id.;
-//                        id << ads_id[ads_id_count];
                         ads_id[ads_id_count] = id[k];
                         ads_id_count++;
                     }
@@ -180,28 +313,21 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
 
                 int convert_sequence = (int(sequence[0]) - 48) * 10 + int(sequence[1] - 48);
 
-//                cout << "ID: " << convert_id << endl;
-//                cout << "Name: " << name << endl;
-//                cout << "Duration: " << convert_duration << endl;
-//                cout << "Channels: " << channels_id_arr[0] << channels_id_arr[1] << channels_id_arr[2]
-//                     << channels_id_arr[3] << endl;
-//                cout << "Sequence: " << convert_sequence << endl;
-                cout << id << endl;
-                cout << "+++++++++++++" << endl;
-//
-
                 for (char t: channels_id_arr) {
                     while (p != nullptr) {
                         if (int(t) - 48 == p->id) {
-                            cout << "Совпало" << endl;
                             struct Ad *temp, *a;
-                            temp = (Ad *) malloc(sizeof(Ad)); // выделяем память
+                            temp = (Ad *) malloc(sizeof(Ad)); // выделяем память для вложенной структуры
                             a = p->ads; // сохранение указателя на следующий узел
                             p->ads = temp; // предыдущий узел указывает на создаваемый
                             temp->id = convert_id; // сохранение поля данных добавляемого узла
                             temp->duration = convert_duration;
-                            while(char s: name) {
-                                temp->name += name[s];
+
+                            int word_count = 0;
+
+                            for (char s: name) {
+                                temp->name[word_count] = s;
+                                word_count++;
                             }
 
                             temp->sequence = convert_sequence;
@@ -215,7 +341,7 @@ Channels *create_total_structure(Channels *p_begin, const char *filename) {
         }
 
         readfile.close();
-        return p_begin;
+//        return p_begin;
     }
 }
 
@@ -232,7 +358,6 @@ Channels *create_channels(const char *filename) {
     p_begin = (Channels *) malloc(sizeof(Channels)); // Выделяем память под первую ячейку структуры
     p = p_begin;
     p->next = nullptr;
-//    p->name = 0;
 
     char id[30]{};
 
@@ -283,9 +408,6 @@ Channels *create_channels(const char *filename) {
                 p->next = (Channels *) malloc(sizeof(Channels));
                 p = p->next;
 
-//                cout << int(channel_id) - 48 << endl;
-//                cout << name << endl;
-
                 p->next = nullptr;
             } else break;
         }
@@ -293,47 +415,4 @@ Channels *create_channels(const char *filename) {
         readfile.close();
         return p_begin;
     }
-}
-
-//List *create_struct(const char *N, int size) {
-//    List *p_begin = nullptr;
-//    List *p = nullptr;
-//    // Выделяем память
-//    p_begin = (List *) malloc(sizeof(List)); // Выделяем память под первую ячейку структуры
-//    p = p_begin;
-//    p->next = nullptr;
-//    p->count = 0;
-//
-//    // Заполняем новую структуру данными
-//    for (int k = 1; k < size; k++) {
-//        p->count = k - 1;
-//        p->value = N[k - 1];
-//        if (k < size - 1) {
-//            p->next = (List *) malloc(sizeof(List)); // Выделяем память под каждую новую ячейку структуры
-//            // Следующий элемент
-//            p = p->next;
-//        }
-//        p->next = nullptr;
-//    }
-//    return p_begin;
-//}
-
-
-void split(const char *str, char del) {
-    // declaring temp string to store the curr "word" upto del
-//    string temp = "";
-    char temp[30];
-
-    for (int i = 0; i < 30; i++) {
-        // If cur char is not del, then append it to the cur "word", otherwise
-        // you have completed the word, print it, and start a new word.
-        if (str[i] != del) {
-            temp[i] = str[i];
-        } else {
-            cout << temp << " ";
-//            temp = "";
-        }
-    }
-
-    cout << temp;
 }
